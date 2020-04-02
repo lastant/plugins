@@ -569,6 +569,24 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
   }
 
+  setFocus(double focus) async {
+    if (!value.isInitialized || _isDisposed) {
+      throw CameraException(
+        'Uninitialized CameraController',
+        'resumeVideoRecording was called on uninitialized CameraController',
+      );
+    }
+    try {
+      value = value.copyWith(isRecordingPaused: false);
+      await _channel.invokeMethod<void>(
+        'setFocus',
+        <String, dynamic>{'textureId': _textureId, 'focus': focus},
+      );
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
   /// Releases the resources of this camera.
   @override
   Future<void> dispose() async {
